@@ -1,0 +1,51 @@
+name: Lembretes quinzenais — Dra. Ivana
+
+on:
+  schedule:
+    # Dias 1 e 16 de cada mês às 12:00 horário de Brasília (15:00 UTC)
+    - cron: '0 15 1,16 * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Simular sem enviar (true/false)'
+        required: false
+        default: 'false'
+
+jobs:
+  enviar-lembretes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Disparar envio de lembretes via Apps Script
+        run: |
+          DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
+
+          # O Apps Script redireciona; -L segue o redirect preservando os params
+          HTTP_CODE=$(curl -s -L \
+            -o /tmp/response.json \
+            -w "%{http_code}" \
+            "https://script.google.com/macros/s/AKfycbwfW_aKEWfNv_rt1x12-F3kHz2BF8VNpgvR2kfz_vVySBvplu57W-p1AxYeNX-SLh6wPA/exec?acao=enviarLembretes&segredo=${{ secrets.LEMBRETE_SECRET }}&dryRun=${DRY_RUN}")
+
+          echo "=== Status HTTP: $HTTP_CODE ==="
+          echo "=== Resposta do Apps Script ==="
+          cat /tmp/response.json | python3 -m json.tool 2>/dev/null || cat /tmp/response.json
+
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "ERRO: status HTTP $HTTP_CODE"
+            exit 1
+          fi
+
+      - name: Verificar resultado
+        run: |
+          RESULT=$(cat /tmp/response.json)
+          OK=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(str(d.get('ok',False)).lower())" 2>/dev/null)
+
+          if [ "$OK" != "true" ]; then
+            echo "ERRO no envio dos lembretes:"
+            cat /tmp/response.json
+            exit 1
+          fi
+
+          ENVIADOS=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('enviados',0))" 2>/dev/null)
+          TOTAL=$(echo "$RESULT" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('total',0))" 2>/dev/null)
+          echo "Lembretes enviados: $ENVIADOS / $TOTAL pacientes ativos"
