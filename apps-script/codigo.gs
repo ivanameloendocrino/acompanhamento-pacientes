@@ -176,8 +176,7 @@ function cicloLembretes(dryRun) {
 // Docs: https://docs.uazapi.com
 // ============================================================
 function enviarWhatsApp(telefone, mensagem, baseUrl, instanceId, token) {
-  // Endpoint uazapi para envio de texto
-  const url = baseUrl.replace(/\/$/, "") + "/message/sendText/" + instanceId;
+  const url = baseUrl.replace(/\/$/, "") + "/send/text";
 
   try {
     const resp = UrlFetchApp.fetch(url, {
