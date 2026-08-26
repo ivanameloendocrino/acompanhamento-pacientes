@@ -9,7 +9,6 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f3; color: #1a1a18; font-size: 15px; padding: 1.5rem 1rem 3rem; }
     .wrap { max-width: 900px; margin: 0 auto; }
-
     .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
     .header-left .title { font-size: 18px; font-weight: 500; color: #1a1a18; }
     .header-left .sub { font-size: 13px; color: #6b6b67; margin-top: 2px; }
@@ -18,20 +17,18 @@
     .btn-refresh:disabled { background: #9FE1CB; cursor: not-allowed; }
     .btn-voltar { padding: 7px 14px; background: #f0f0ec; color: #1a1a18; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
     .btn-voltar:hover { background: #e4e4e0; }
-
     .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
     .metric { background: #f0f0ec; border-radius: 8px; padding: 1rem; }
     .metric-label { font-size: 12px; color: #6b6b67; margin-bottom: 4px; }
     .metric-val { font-size: 24px; font-weight: 500; color: #1a1a18; }
     .metric-sub { font-size: 12px; color: #a0a09a; margin-top: 2px; }
-
     .filters { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
     .filter-btn { font-size: 13px; padding: 6px 14px; border-radius: 8px; border: 0.5px solid #ddd; background: #fff; color: #6b6b67; cursor: pointer; }
     .filter-btn.active { background: #E1F5EE; color: #085041; border-color: #5DCAA5; }
-
+    .filter-btn.inativo-btn { color: #a0a09a; }
+    .filter-btn.inativo-btn.active { background: #f0f0ec; color: #6b6b67; border-color: #aaa; }
     .card { background: #fff; border: 0.5px solid #e8e8e4; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
     .card-title { font-size: 12px; font-weight: 500; color: #6b6b67; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 1rem; }
-
     table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
     th { text-align: left; padding: 6px 8px; color: #a0a09a; font-weight: 400; border-bottom: 0.5px solid #e8e8e4; font-size: 12px; }
     td { padding: 9px 8px; border-bottom: 0.5px solid #e8e8e4; color: #1a1a18; vertical-align: middle; }
@@ -39,7 +36,6 @@
     tr:hover td { background: #f5f5f3; }
     tr.clickable { cursor: pointer; }
     tr.clickable:hover td { background: #E1F5EE; }
-
     .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 5px; }
     .badge-ok { background: #E1F5EE; color: #085041; }
     .badge-warn { background: #FAEEDA; color: #633806; }
@@ -48,10 +44,9 @@
     .badge-ob { background: #EEEDFE; color: #3C3489; }
     .badge-am { background: #FBEAF0; color: #72243E; }
     .badge-nr { background: #FAEEDA; color: #633806; }
-
+    .badge-inativo { background: #f0f0ec; color: #a0a09a; }
     .bar-wrap { background: #f0f0ec; border-radius: 4px; height: 6px; width: 100%; overflow: hidden; margin-bottom: 2px; }
     .bar-fill { height: 6px; border-radius: 4px; }
-
     .alert-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid #e8e8e4; }
     .alert-row:last-child { border-bottom: none; }
     .alert-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
@@ -60,17 +55,13 @@
     .alert-text { flex: 1; }
     .alert-text p { margin: 0; font-size: 13px; }
     .alert-text span { font-size: 12px; color: #6b6b67; }
-
     .chart-wrap { position: relative; height: 200px; }
     .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; font-size: 12px; color: #6b6b67; }
     .legend span { display: flex; align-items: center; gap: 5px; }
     .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
-
     .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
-
     .loading { text-align: center; padding: 3rem; color: #6b6b67; font-size: 14px; }
     .empty { text-align: center; padding: 2rem; color: #a0a09a; font-size: 13px; }
-
     /* Detalhe paciente */
     .paciente-header { display: flex; align-items: center; gap: 14px; margin-bottom: 1.5rem; flex-wrap: wrap; }
     .paciente-avatar { width: 52px; height: 52px; border-radius: 50%; background: #E1F5EE; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
@@ -82,7 +73,6 @@
     .checkin-item { font-size: 13px; color: #1a1a18; }
     .checkin-item .label { font-size: 11px; color: #6b6b67; margin-bottom: 2px; }
     .duvida-box { background: #f0f0ec; border-left: 3px solid #1D9E75; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1a1a18; margin-top: 6px; font-style: italic; }
-
     @media (max-width: 600px) {
       table { font-size: 12px; }
       th, td { padding: 6px 4px; }
@@ -91,7 +81,6 @@
 </head>
 <body>
 <div class="wrap">
-
   <!-- TELA PRINCIPAL -->
   <div id="tela-principal">
     <div class="header">
@@ -101,10 +90,8 @@
       </div>
       <button class="btn-refresh" id="btn-refresh" onclick="carregarDados()">⟳ Atualizar</button>
     </div>
-
     <div id="loading" class="loading">Carregando dados da planilha...</div>
     <div id="conteudo" style="display:none">
-
       <div class="metric-grid">
         <div class="metric">
           <p class="metric-label">Total de pacientes</p>
@@ -127,15 +114,14 @@
           <p class="metric-sub">dieta + exercício</p>
         </div>
       </div>
-
       <div class="filters">
         <button class="filter-btn active" onclick="filtrar('todos',this)">Todos</button>
         <button class="filter-btn" onclick="filtrar('DM2',this)">DM2</button>
         <button class="filter-btn" onclick="filtrar('Obesidade',this)">Obesidade</button>
         <button class="filter-btn" onclick="filtrar('Ambos',this)">Ambos</button>
         <button class="filter-btn" onclick="filtrar('alerta',this)">⚠ Alertas</button>
+        <button class="filter-btn inativo-btn" onclick="filtrar('Inativo',this)">Inativos</button>
       </div>
-
       <div class="card">
         <p class="card-title">Pacientes — clique para ver detalhes</p>
         <div style="overflow-x:auto">
@@ -155,7 +141,6 @@
           </table>
         </div>
       </div>
-
       <div class="two-col">
         <div class="card">
           <p class="card-title">Alertas ativos</p>
@@ -172,17 +157,14 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
-
   <!-- TELA DETALHE PACIENTE -->
   <div id="tela-detalhe" style="display:none">
     <div class="header">
       <button class="btn-voltar" onclick="voltarLista()">← Voltar</button>
       <button class="btn-refresh" onclick="carregarDados()">⟳ Atualizar</button>
     </div>
-
     <div class="paciente-header">
       <div class="paciente-avatar">🧑‍⚕️</div>
       <div class="paciente-info">
@@ -190,9 +172,7 @@
         <p class="meta" id="det-meta">—</p>
       </div>
     </div>
-
     <div class="metric-grid" id="det-metrics"></div>
-
     <div class="two-col">
       <div class="card">
         <p class="card-title">Evolução do peso</p>
@@ -211,15 +191,12 @@
         </div>
       </div>
     </div>
-
     <div class="card">
       <p class="card-title">Histórico de check-ins</p>
       <div id="det-checkins"></div>
     </div>
   </div>
-
 </div>
-
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfW_aKEWfNv_rt1x12-F3kHz2BF8VNpgvR2kfz_vVySBvplu57W-p1AxYeNX-SLh6wPA/exec";
 let dadosGlobal = { pacientes: [], respostas: [] };
@@ -227,14 +204,12 @@ let filtroAtual = 'todos';
 let chartAdesao = null;
 let chartPeso = null;
 let chartAdesaoDet = null;
-
 async function carregarDados() {
   const btn = document.getElementById('btn-refresh');
   btn.disabled = true;
   btn.textContent = 'Carregando...';
   document.getElementById('loading').style.display = 'block';
   document.getElementById('conteudo').style.display = 'none';
-
   try {
     const resp = await fetch(SCRIPT_URL + "?acao=dados");
     const data = await resp.json();
@@ -245,39 +220,42 @@ async function carregarDados() {
   } catch(err) {
     document.getElementById('loading').textContent = 'Erro ao carregar dados. Verifique se o Apps Script está publicado corretamente.';
   }
-
   btn.disabled = false;
   btn.textContent = '⟳ Atualizar';
 }
-
 function renderTudo() {
   renderTabela();
   renderAlertas();
   renderGrafico();
 }
-
 function filtrar(f, btn) {
   filtroAtual = f;
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderTabela();
 }
-
 function todasRespostasPaciente(codigo) {
   return dadosGlobal.respostas.slice(1)
     .filter(r => r[1] === codigo)
     .sort((a, b) => new Date(a[0]) - new Date(b[0]));
 }
-
 function ultimaResposta(codigo) {
   const respostas = todasRespostasPaciente(codigo);
   return respostas.length ? respostas[respostas.length - 1] : null;
 }
-
+// Retorna true se o paciente está ativo (coluna D da planilha = p[3])
+// Pacientes sem valor na coluna Status são tratados como Ativos
+function estaAtivo(p) {
+  return !p[3] || p[3].trim().toLowerCase() !== 'inativo';
+}
 function renderTabela() {
   const pacientes = dadosGlobal.pacientes.slice(1).filter(p => p[0]);
-
   const lista = pacientes.filter(p => {
+    const ativo = estaAtivo(p);
+    // Filtro "Inativos": mostra apenas inativos
+    if (filtroAtual === 'Inativo') return !ativo;
+    // Todos os outros filtros: mostrar apenas ativos
+    if (!ativo) return false;
     if (filtroAtual === 'todos') return true;
     if (filtroAtual === 'alerta') {
       const resp = ultimaResposta(p[0]);
@@ -286,29 +264,24 @@ function renderTabela() {
     }
     return p[2] === filtroAtual;
   });
-
   const responderam = lista.filter(p => ultimaResposta(p[0]));
   const nResp = lista.length - responderam.length;
   const adDieta = responderam.length ? responderam.reduce((s, p) => { const r = ultimaResposta(p[0]); return s + (parseFloat(r[6]) || 0); }, 0) / responderam.length : 0;
   const adEx = responderam.length ? responderam.reduce((s, p) => { const r = ultimaResposta(p[0]); return s + parseFloat(r[8]) || 0; }, 0) / responderam.length : 0;
-
-  document.getElementById('m-total').textContent = lista.length;
+  document.getElementById('m-total').textContent = filtroAtual === 'Inativo' ? lista.length : pacientes.filter(estaAtivo).length;
   document.getElementById('m-resp').textContent = responderam.length;
   document.getElementById('m-resp-pct').textContent = lista.length ? Math.round(responderam.length / lista.length * 100) + '% de taxa' : '';
   document.getElementById('m-nr').textContent = nResp;
   document.getElementById('m-ades').textContent = responderam.length ? ((adDieta + adEx) / 2).toFixed(1) + '/10' : '—';
-
   const tbody = document.getElementById('pt-body');
   if (!lista.length) {
-    tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum paciente cadastrado ainda.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum paciente ' + (filtroAtual === 'Inativo' ? 'inativo' : 'cadastrado') + ' ainda.</td></tr>';
     return;
   }
-
   tbody.innerHTML = lista.map(p => {
     const resp = ultimaResposta(p[0]);
     const diagClass = p[2] === 'DM2' ? 'badge-dm' : p[2] === 'Obesidade' ? 'badge-ob' : 'badge-am';
     const peso = resp ? parseFloat(resp[4]).toFixed(1) + ' kg' : '—';
-
     const todas = todasRespostasPaciente(p[0]);
     let variacao = '—', varColor = 'color:#a0a09a';
     if (todas.length >= 2) {
@@ -316,15 +289,15 @@ function renderTabela() {
       variacao = (diff > 0 ? '+' : '') + diff.toFixed(1) + ' kg';
       varColor = diff > 0 ? 'color:#A32D2D' : diff < 0 ? 'color:#0F6E56' : 'color:#a0a09a';
     }
-
     const dieta = resp ? parseInt(resp[6]) : null;
     const exercicio = resp ? parseFloat(resp[8]) || 0 : null;
     const nrTag = !resp ? '<span class="badge badge-nr" style="margin-left:4px">Sem resposta</span>' : '';
-    const statusClass = !resp ? 'badge-warn' : (dieta < 4 || exercicio < 3) ? 'badge-alert' : 'badge-ok';
-    const statusLabel = !resp ? 'Pendente' : (dieta < 4 || exercicio < 3) ? 'Alerta' : 'Estável';
-
+    // Paciente inativo: badge cinza; ativo: lógica normal
+    const inativo = !estaAtivo(p);
+    const statusClass = inativo ? 'badge-inativo' : (!resp ? 'badge-warn' : (dieta < 4 || exercicio < 3) ? 'badge-alert' : 'badge-ok');
+    const statusLabel = inativo ? 'Inativo' : (!resp ? 'Pendente' : (dieta < 4 || exercicio < 3) ? 'Alerta' : 'Estável');
     return `<tr class="clickable" onclick="abrirDetalhe('${p[0]}')">
-      <td><span style="font-weight:500">${p[1]}</span>${nrTag}</td>
+      <td><span style="font-weight:500${inativo ? ';color:#a0a09a' : ''}">${p[1]}</span>${nrTag}</td>
       <td><span class="badge ${diagClass}">${p[2] || '—'}</span></td>
       <td>${peso}</td>
       <td style="${varColor};font-weight:500">${variacao}</td>
@@ -334,18 +307,16 @@ function renderTabela() {
     </tr>`;
   }).join('');
 }
-
 function renderAlertas() {
-  const pacientes = dadosGlobal.pacientes.slice(1).filter(p => p[0]);
+  // Alertas apenas para pacientes ativos
+  const pacientes = dadosGlobal.pacientes.slice(1).filter(p => p[0] && estaAtivo(p));
   const alertas = pacientes.filter(p => {
     const resp = ultimaResposta(p[0]);
     if (!resp) return true;
     return parseInt(resp[6]) < 4 || parseFloat(resp[8]) || 0 < 1.5;
   });
-
   const el = document.getElementById('alertas-list');
   if (!alertas.length) { el.innerHTML = '<p class="empty">Nenhum alerta no momento.</p>'; return; }
-
   el.innerHTML = alertas.slice(0, 5).map(p => {
     const resp = ultimaResposta(p[0]);
     const tipo = !resp ? 'warn' : 'danger';
@@ -358,14 +329,12 @@ function renderAlertas() {
     </div>`;
   }).join('');
 }
-
 function renderGrafico() {
   const respostas = dadosGlobal.respostas.slice(1).filter(r => r[0] && r[6]).sort((a, b) => new Date(a[0]) - new Date(b[0]));
   const ultimas = respostas.slice(-8);
   const labels = ultimas.map(r => new Date(r[0]).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
   const dietas = ultimas.map(r => parseFloat(r[6]) || 0);
   const exercicios = ultimas.map(r => parseFloat(r[8]) || 0);
-
   if (chartAdesao) chartAdesao.destroy();
   const ctx = document.getElementById('chartAdesao').getContext('2d');
   chartAdesao = new Chart(ctx, {
@@ -383,26 +352,21 @@ function renderGrafico() {
     }
   });
 }
-
 // ---- DETALHE DO PACIENTE ----
-
 function abrirDetalhe(codigo) {
   const paciente = dadosGlobal.pacientes.slice(1).find(p => p[0] === codigo);
   if (!paciente) return;
   const respostas = todasRespostasPaciente(codigo);
-
   document.getElementById('tela-principal').style.display = 'none';
   document.getElementById('tela-detalhe').style.display = 'block';
-
   document.getElementById('det-nome').textContent = paciente[1];
-  document.getElementById('det-meta').textContent = `${paciente[2]} · Código: ${paciente[0]} · ${respostas.length} check-in(s) registrado(s)`;
-
+  const statusLabel = estaAtivo(paciente) ? 'Ativo' : 'Inativo';
+  document.getElementById('det-meta').textContent = `${paciente[2]} · Código: ${paciente[0]} · ${statusLabel} · ${respostas.length} check-in(s) registrado(s)`;
   // Métricas rápidas
   const ultima = respostas.length ? respostas[respostas.length - 1] : null;
   const primeira = respostas.length ? respostas[0] : null;
   const variacaoTotal = (primeira && ultima && primeira !== ultima) ? (parseFloat(ultima[4]) - parseFloat(primeira[4])).toFixed(1) : null;
   const varSign = variacaoTotal > 0 ? '+' : '';
-
   document.getElementById('det-metrics').innerHTML = `
     <div class="metric"><p class="metric-label">Último peso</p><p class="metric-val">${ultima ? parseFloat(ultima[4]).toFixed(1) + ' kg' : '—'}</p><p class="metric-sub">check-in mais recente</p></div>
     <div class="metric"><p class="metric-label">Variação total</p><p class="metric-val" style="color:${variacaoTotal < 0 ? '#0F6E56' : variacaoTotal > 0 ? '#A32D2D' : '#1a1a18'}">${variacaoTotal !== null ? varSign + variacaoTotal + ' kg' : '—'}</p><p class="metric-sub">desde o primeiro check-in</p></div>
@@ -410,11 +374,9 @@ function abrirDetalhe(codigo) {
     <div class="metric"><p class="metric-label">Exercício</p><p class="metric-val">${ultima ? ultima[8] + 'x/sem' : '—'}</p><p class="metric-sub">último check-in</p></div>
     <div class="metric"><p class="metric-label">Bem-estar</p><p class="metric-val">${ultima ? ultima[14] + '/10' : '—'}</p><p class="metric-sub">último check-in</p></div>
   `;
-
   // Gráfico de peso
   const labels = respostas.map(r => new Date(r[0]).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
   const pesos = respostas.map(r => parseFloat(r[4]) || null);
-
   if (chartPeso) chartPeso.destroy();
   chartPeso = new Chart(document.getElementById('chartPeso').getContext('2d'), {
     type: 'line',
@@ -422,7 +384,6 @@ function abrirDetalhe(codigo) {
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
       scales: { y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(128,128,128,0.1)' } }, x: { ticks: { font: { size: 11 } }, grid: { display: false } } } }
   });
-
   // Gráfico de adesão
   if (chartAdesaoDet) chartAdesaoDet.destroy();
   chartAdesaoDet = new Chart(document.getElementById('chartAdesaoDet').getContext('2d'), {
@@ -439,7 +400,6 @@ function abrirDetalhe(codigo) {
       }
     }
   });
-
   // Histórico de check-ins (mais recente primeiro)
   const checkins = [...respostas].reverse();
   document.getElementById('det-checkins').innerHTML = checkins.length ? checkins.map(r => {
@@ -454,7 +414,6 @@ function abrirDetalhe(codigo) {
         <div class="checkin-item"><p class="label">Adesão dieta</p>${r[6]}/10</div>
         <div class="checkin-item"><p class="label">Dificuldades dieta</p>${r[7] || '—'}</div>
         <div class="checkin-item"><p class="label">Dias exercício/sem</p>${r[8] || '—'}</div>
-        <div class="checkin-item"><p class="label">Dias exercício/sem</p>${r[8] || '—'}</div>
         <div class="checkin-item"><p class="label">Tipo exercício</p>${r[10] || '—'}</div>
         <div class="checkin-item"><p class="label">Medicação</p>${r[11] || '—'}</div>
         <div class="checkin-item"><p class="label">Efeitos colaterais</p>${efeitos}</div>
@@ -464,12 +423,10 @@ function abrirDetalhe(codigo) {
     </div>`;
   }).join('') : '<p class="empty">Nenhum check-in registrado ainda.</p>';
 }
-
 function voltarLista() {
   document.getElementById('tela-detalhe').style.display = 'none';
   document.getElementById('tela-principal').style.display = 'block';
 }
-
 carregarDados();
 </script>
 </body>
