@@ -1,433 +1,340 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard — Dra. Ivana</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f3; color: #1a1a18; font-size: 15px; padding: 1.5rem 1rem 3rem; }
-    .wrap { max-width: 900px; margin: 0 auto; }
-    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px; }
-    .header-left .title { font-size: 18px; font-weight: 500; color: #1a1a18; }
-    .header-left .sub { font-size: 13px; color: #6b6b67; margin-top: 2px; }
-    .btn-refresh { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: #1D9E75; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
-    .btn-refresh:hover { background: #0F6E56; }
-    .btn-refresh:disabled { background: #9FE1CB; cursor: not-allowed; }
-    .btn-voltar { padding: 7px 14px; background: #f0f0ec; color: #1a1a18; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
-    .btn-voltar:hover { background: #e4e4e0; }
-    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
-    .metric { background: #f0f0ec; border-radius: 8px; padding: 1rem; }
-    .metric-label { font-size: 12px; color: #6b6b67; margin-bottom: 4px; }
-    .metric-val { font-size: 24px; font-weight: 500; color: #1a1a18; }
-    .metric-sub { font-size: 12px; color: #a0a09a; margin-top: 2px; }
-    .filters { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
-    .filter-btn { font-size: 13px; padding: 6px 14px; border-radius: 8px; border: 0.5px solid #ddd; background: #fff; color: #6b6b67; cursor: pointer; }
-    .filter-btn.active { background: #E1F5EE; color: #085041; border-color: #5DCAA5; }
-    .filter-btn.inativo-btn { color: #a0a09a; }
-    .filter-btn.inativo-btn.active { background: #f0f0ec; color: #6b6b67; border-color: #aaa; }
-    .card { background: #fff; border: 0.5px solid #e8e8e4; border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
-    .card-title { font-size: 12px; font-weight: 500; color: #6b6b67; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 1rem; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
-    th { text-align: left; padding: 6px 8px; color: #a0a09a; font-weight: 400; border-bottom: 0.5px solid #e8e8e4; font-size: 12px; }
-    td { padding: 9px 8px; border-bottom: 0.5px solid #e8e8e4; color: #1a1a18; vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #f5f5f3; }
-    tr.clickable { cursor: pointer; }
-    tr.clickable:hover td { background: #E1F5EE; }
-    .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 5px; }
-    .badge-ok { background: #E1F5EE; color: #085041; }
-    .badge-warn { background: #FAEEDA; color: #633806; }
-    .badge-alert { background: #FCEBEB; color: #791F1F; }
-    .badge-dm { background: #E6F1FB; color: #0C447C; }
-    .badge-ob { background: #EEEDFE; color: #3C3489; }
-    .badge-am { background: #FBEAF0; color: #72243E; }
-    .badge-nr { background: #FAEEDA; color: #633806; }
-    .badge-inativo { background: #f0f0ec; color: #a0a09a; }
-    .bar-wrap { background: #f0f0ec; border-radius: 4px; height: 6px; width: 100%; overflow: hidden; margin-bottom: 2px; }
-    .bar-fill { height: 6px; border-radius: 4px; }
-    .alert-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid #e8e8e4; }
-    .alert-row:last-child { border-bottom: none; }
-    .alert-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
-    .alert-icon.warn { background: #FAEEDA; }
-    .alert-icon.danger { background: #FCEBEB; }
-    .alert-text { flex: 1; }
-    .alert-text p { margin: 0; font-size: 13px; }
-    .alert-text span { font-size: 12px; color: #6b6b67; }
-    .chart-wrap { position: relative; height: 200px; }
-    .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 8px; font-size: 12px; color: #6b6b67; }
-    .legend span { display: flex; align-items: center; gap: 5px; }
-    .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
-    .two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
-    .loading { text-align: center; padding: 3rem; color: #6b6b67; font-size: 14px; }
-    .empty { text-align: center; padding: 2rem; color: #a0a09a; font-size: 13px; }
-    /* Detalhe paciente */
-    .paciente-header { display: flex; align-items: center; gap: 14px; margin-bottom: 1.5rem; flex-wrap: wrap; }
-    .paciente-avatar { width: 52px; height: 52px; border-radius: 50%; background: #E1F5EE; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-    .paciente-info .nome { font-size: 18px; font-weight: 500; }
-    .paciente-info .meta { font-size: 13px; color: #6b6b67; margin-top: 3px; }
-    .checkin-card { background: #f5f5f3; border-radius: 10px; padding: 1rem; margin-bottom: .75rem; }
-    .checkin-data { font-size: 12px; color: #a0a09a; margin-bottom: .5rem; }
-    .checkin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
-    .checkin-item { font-size: 13px; color: #1a1a18; }
-    .checkin-item .label { font-size: 11px; color: #6b6b67; margin-bottom: 2px; }
-    .duvida-box { background: #f0f0ec; border-left: 3px solid #1D9E75; border-radius: 4px; padding: 8px 12px; font-size: 13px; color: #1a1a18; margin-top: 6px; font-style: italic; }
-    @media (max-width: 600px) {
-      table { font-size: 12px; }
-      th, td { padding: 6px 4px; }
-    }
-  </style>
-</head>
-<body>
-<div class="wrap">
-  <!-- TELA PRINCIPAL -->
-  <div id="tela-principal">
-    <div class="header">
-      <div class="header-left">
-        <p class="title">Dashboard de acompanhamento</p>
-        <p class="sub">Dra. Ivana — Endocrinologia</p>
-      </div>
-      <button class="btn-refresh" id="btn-refresh" onclick="carregarDados()">⟳ Atualizar</button>
-    </div>
-    <div id="loading" class="loading">Carregando dados da planilha...</div>
-    <div id="conteudo" style="display:none">
-      <div class="metric-grid">
-        <div class="metric">
-          <p class="metric-label">Total de pacientes</p>
-          <p class="metric-val" id="m-total">—</p>
-          <p class="metric-sub">carteira ativa</p>
-        </div>
-        <div class="metric">
-          <p class="metric-label">Responderam</p>
-          <p class="metric-val" id="m-resp">—</p>
-          <p class="metric-sub" id="m-resp-pct">últimos 15 dias</p>
-        </div>
-        <div class="metric">
-          <p class="metric-label">Sem resposta</p>
-          <p class="metric-val" id="m-nr" style="color:#BA7517">—</p>
-          <p class="metric-sub">requerem contato</p>
-        </div>
-        <div class="metric">
-          <p class="metric-label">Adesão média</p>
-          <p class="metric-val" id="m-ades">—</p>
-          <p class="metric-sub">dieta + exercício</p>
-        </div>
-      </div>
-      <div class="filters">
-        <button class="filter-btn active" onclick="filtrar('todos',this)">Todos</button>
-        <button class="filter-btn" onclick="filtrar('DM2',this)">DM2</button>
-        <button class="filter-btn" onclick="filtrar('Obesidade',this)">Obesidade</button>
-        <button class="filter-btn" onclick="filtrar('Ambos',this)">Ambos</button>
-        <button class="filter-btn" onclick="filtrar('alerta',this)">⚠ Alertas</button>
-        <button class="filter-btn inativo-btn" onclick="filtrar('Inativo',this)">Inativos</button>
-      </div>
-      <div class="card">
-        <p class="card-title">Pacientes — clique para ver detalhes</p>
-        <div style="overflow-x:auto">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:26%">Paciente</th>
-                <th style="width:14%">Diagnóstico</th>
-                <th style="width:12%">Último peso</th>
-                <th style="width:12%">Variação</th>
-                <th style="width:13%">Dieta</th>
-                <th style="width:13%">Exercício</th>
-                <th style="width:10%">Status</th>
-              </tr>
-            </thead>
-            <tbody id="pt-body"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="two-col">
-        <div class="card">
-          <p class="card-title">Alertas ativos</p>
-          <div id="alertas-list"></div>
-        </div>
-        <div class="card">
-          <p class="card-title">Adesão coletiva — últimas respostas</p>
-          <div class="legend">
-            <span><span class="legend-dot" style="background:#1D9E75"></span>Dieta</span>
-            <span><span class="legend-dot" style="background:#534AB7"></span>Dias exercício/sem</span>
-          </div>
-          <div class="chart-wrap">
-            <canvas id="chartAdesao"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- TELA DETALHE PACIENTE -->
-  <div id="tela-detalhe" style="display:none">
-    <div class="header">
-      <button class="btn-voltar" onclick="voltarLista()">← Voltar</button>
-      <button class="btn-refresh" onclick="carregarDados()">⟳ Atualizar</button>
-    </div>
-    <div class="paciente-header">
-      <div class="paciente-avatar">🧑‍⚕️</div>
-      <div class="paciente-info">
-        <p class="nome" id="det-nome">—</p>
-        <p class="meta" id="det-meta">—</p>
-      </div>
-    </div>
-    <div class="metric-grid" id="det-metrics"></div>
-    <div class="two-col">
-      <div class="card">
-        <p class="card-title">Evolução do peso</p>
-        <div class="chart-wrap">
-          <canvas id="chartPeso"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <p class="card-title">Adesão ao longo do tempo</p>
-        <div class="legend">
-          <span><span class="legend-dot" style="background:#1D9E75"></span>Dieta</span>
-          <span><span class="legend-dot" style="background:#534AB7"></span>Exercício</span>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="chartAdesaoDet"></canvas>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <p class="card-title">Histórico de check-ins</p>
-      <div id="det-checkins"></div>
-    </div>
-  </div>
-</div>
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfW_aKEWfNv_rt1x12-F3kHz2BF8VNpgvR2kfz_vVySBvplu57W-p1AxYeNX-SLh6wPA/exec";
-let dadosGlobal = { pacientes: [], respostas: [] };
-let filtroAtual = 'todos';
-let chartAdesao = null;
-let chartPeso = null;
-let chartAdesaoDet = null;
-async function carregarDados() {
-  const btn = document.getElementById('btn-refresh');
-  btn.disabled = true;
-  btn.textContent = 'Carregando...';
-  document.getElementById('loading').style.display = 'block';
-  document.getElementById('conteudo').style.display = 'none';
+// ============================================================
+// CONFIGURAÇÕES — edite apenas esta seção
+// ============================================================
+const CONFIG = {
+  SHEET_ID:          "11hNd1faQ9N1LLtK-2gwkL0_kYGw18w8IUBXnUTfA8ZA",
+  ABA_PACIENTES:     "pacientes",
+  ABA_RESPOSTAS:     "respostas",
+  EMAIL_ALERTA:      "dra.ivanamelo25@gmail.com",
+  DIAS_SEM_RESPOSTA: 3,
+};
+
+const URL_BASE = "https://ivanameloendocrino.github.io/acompanhamento-pacientes/";
+
+// Colunas da aba Pacientes (1-based, para uso com getRange)
+const P = {
+  CODIGO:        1,  // A
+  NOME:          2,  // B
+  DIAGNOSTICO:   3,  // C
+  WHATSAPP:      4,  // D  — número sem DDI, ex: 85998103840
+  TOKEN:         5,  // E
+  TOKEN_USADO:   6,  // F
+  LINK_CHECKIN:  7,  // G
+  DATA_DISPARO:  8,  // H
+  LINK_WHATSAPP: 9,  // I
+};
+
+// ============================================================
+// ENDPOINT GET — único ponto de entrada para requisições GET
+// ============================================================
+function doGet(e) {
+  const params = e.parameter || {};
+  const acao   = params.acao;
+
+  if (acao === "dados") {
+    return retornarDados();
+  }
+
+  if (acao === "enviarLembretes") {
+    return enviarLembretesHttp(params);
+  }
+
+  return resposta({ ok: true, status: "Sistema de acompanhamento ativo." });
+}
+
+// ============================================================
+// ENDPOINT POST — recebe respostas do formulário
+// ============================================================
+function doPost(e) {
   try {
-    const resp = await fetch(SCRIPT_URL + "?acao=dados");
-    const data = await resp.json();
-    dadosGlobal = data;
-    renderTudo();
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('conteudo').style.display = 'block';
-  } catch(err) {
-    document.getElementById('loading').textContent = 'Erro ao carregar dados. Verifique se o Apps Script está publicado corretamente.';
-  }
-  btn.disabled = false;
-  btn.textContent = '⟳ Atualizar';
-}
-function renderTudo() {
-  renderTabela();
-  renderAlertas();
-  renderGrafico();
-}
-function filtrar(f, btn) {
-  filtroAtual = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderTabela();
-}
-function todasRespostasPaciente(codigo) {
-  return dadosGlobal.respostas.slice(1)
-    .filter(r => r[1] === codigo)
-    .sort((a, b) => new Date(a[0]) - new Date(b[0]));
-}
-function ultimaResposta(codigo) {
-  const respostas = todasRespostasPaciente(codigo);
-  return respostas.length ? respostas[respostas.length - 1] : null;
-}
-// Retorna true se o paciente está ativo (coluna D da planilha = p[3])
-// Pacientes sem valor na coluna Status são tratados como Ativos
-function estaAtivo(p) {
-  return !p[3] || p[3].trim().toLowerCase() !== 'inativo';
-}
-function renderTabela() {
-  const pacientes = dadosGlobal.pacientes.slice(1).filter(p => p[0]);
-  const lista = pacientes.filter(p => {
-    const ativo = estaAtivo(p);
-    // Filtro "Inativos": mostra apenas inativos
-    if (filtroAtual === 'Inativo') return !ativo;
-    // Todos os outros filtros: mostrar apenas ativos
-    if (!ativo) return false;
-    if (filtroAtual === 'todos') return true;
-    if (filtroAtual === 'alerta') {
-      const resp = ultimaResposta(p[0]);
-      if (!resp) return true;
-      return parseInt(resp[6]) < 4 || parseFloat(resp[8]) || 0 < 1.5;
+    const dados    = JSON.parse(e.postData.contents);
+    const token    = dados.token || "";
+    const paciente = buscarPacientePorToken(token);
+
+    if (!paciente) {
+      return resposta({ ok: false, erro: "Token inválido ou expirado." });
     }
-    return p[2] === filtroAtual;
-  });
-  const responderam = lista.filter(p => ultimaResposta(p[0]));
-  const nResp = lista.length - responderam.length;
-  const adDieta = responderam.length ? responderam.reduce((s, p) => { const r = ultimaResposta(p[0]); return s + (parseFloat(r[6]) || 0); }, 0) / responderam.length : 0;
-  const adEx = responderam.length ? responderam.reduce((s, p) => { const r = ultimaResposta(p[0]); return s + parseFloat(r[8]) || 0; }, 0) / responderam.length : 0;
-  document.getElementById('m-total').textContent = filtroAtual === 'Inativo' ? lista.length : pacientes.filter(estaAtivo).length;
-  document.getElementById('m-resp').textContent = responderam.length;
-  document.getElementById('m-resp-pct').textContent = lista.length ? Math.round(responderam.length / lista.length * 100) + '% de taxa' : '';
-  document.getElementById('m-nr').textContent = nResp;
-  document.getElementById('m-ades').textContent = responderam.length ? ((adDieta + adEx) / 2).toFixed(1) + '/10' : '—';
-  const tbody = document.getElementById('pt-body');
-  if (!lista.length) {
-    tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum paciente ' + (filtroAtual === 'Inativo' ? 'inativo' : 'cadastrado') + ' ainda.</td></tr>';
-    return;
+
+    invalidarToken(paciente.linha);
+    gravarResposta(dados, paciente);
+    verificarAlertas();
+
+    return resposta({ ok: true, mensagem: "Resposta registrada com sucesso." });
+  } catch (err) {
+    return resposta({ ok: false, erro: err.message });
   }
-  tbody.innerHTML = lista.map(p => {
-    const resp = ultimaResposta(p[0]);
-    const diagClass = p[2] === 'DM2' ? 'badge-dm' : p[2] === 'Obesidade' ? 'badge-ob' : 'badge-am';
-    const peso = resp ? parseFloat(resp[4]).toFixed(1) + ' kg' : '—';
-    const todas = todasRespostasPaciente(p[0]);
-    let variacao = '—', varColor = 'color:#a0a09a';
-    if (todas.length >= 2) {
-      const diff = parseFloat(todas[todas.length-1][4]) - parseFloat(todas[todas.length-2][4]);
-      variacao = (diff > 0 ? '+' : '') + diff.toFixed(1) + ' kg';
-      varColor = diff > 0 ? 'color:#A32D2D' : diff < 0 ? 'color:#0F6E56' : 'color:#a0a09a';
+}
+
+// ============================================================
+// DADOS PARA O DASHBOARD
+// ============================================================
+function retornarDados() {
+  const ss        = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  const pacientes = ss.getSheetByName(CONFIG.ABA_PACIENTES).getDataRange().getValues();
+  const respostas = ss.getSheetByName(CONFIG.ABA_RESPOSTAS).getDataRange().getValues();
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ pacientes, respostas }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// ============================================================
+// LEMBRETES QUINZENAIS — endpoint HTTP (chamado pelo GitHub Actions)
+// ============================================================
+function enviarLembretesHttp(params) {
+  const segredoSalvo = PropertiesService.getScriptProperties().getProperty("LEMBRETE_SECRET");
+
+  if (!segredoSalvo || params.segredo !== segredoSalvo) {
+    return resposta({ ok: false, erro: "Não autorizado." });
+  }
+
+  const isDryRun = (params.dryRun === "true");
+  const resultado = cicloLembretes(isDryRun);
+  return resposta(resultado);
+}
+
+// ============================================================
+// CICLO QUINZENAL — gera tokens, atualiza planilha e envia
+// ============================================================
+function cicloLembretes(dryRun) {
+  dryRun = dryRun || false;
+
+  const props      = PropertiesService.getScriptProperties();
+  const baseUrl    = props.getProperty("UAZAPI_BASE_URL");   // https://bflabs.uazapi.com
+  const instanceId = props.getProperty("UAZAPI_INSTANCE_ID"); // r564b2c65290e0b
+  const apiToken   = props.getProperty("UAZAPI_TOKEN");       // a75cc4d7-...
+
+  if (!dryRun && (!baseUrl || !instanceId || !apiToken)) {
+    return { ok: false, erro: "Credenciais uazapi ausentes (UAZAPI_BASE_URL, UAZAPI_INSTANCE_ID, UAZAPI_TOKEN)." };
+  }
+
+  const ss    = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  const aba   = ss.getSheetByName(CONFIG.ABA_PACIENTES);
+  const dados = aba.getDataRange().getValues();
+  const hoje  = new Date();
+
+  let enviados = 0, pulados = 0;
+  const erros = [];
+
+  for (let i = 1; i < dados.length; i++) {
+    const codigo   = String(dados[i][P.CODIGO - 1]    || "").trim();
+    const nome     = String(dados[i][P.NOME - 1]      || "").trim();
+    const whatsapp = String(dados[i][P.WHATSAPP - 1]  || "").replace(/\D/g, "");
+
+    if (!codigo || !nome || !whatsapp) { pulados++; continue; }
+
+    const novoToken      = Utilities.getUuid();
+    const telefone       = "55" + whatsapp;
+    const linkCheckin    = URL_BASE + "?token=" + novoToken + "&codigo=" + encodeURIComponent(codigo);
+    const primeiroNome   = nome.split(" ")[0];
+
+    const mensagem =
+      "Olá, " + primeiroNome + "! 👋\n\n" +
+      "É hora do seu acompanhamento com a Dra. Ivana Melo.\n\n" +
+      "Preencha o formulário de acompanhamento — leva menos de 2 minutos:\n\n" +
+      "📋 " + linkCheckin + "\n\n" +
+      "Sua participação é essencial para o sucesso do seu tratamento. 💚\n\n" +
+      "— Consultório Dra. Ivana Melo · Endocrinologista";
+
+    const linkWhatsapp = "https://wa.me/" + telefone + "?text=" + encodeURIComponent(mensagem);
+
+    // Atualiza planilha com novo token e links
+    const linha = i + 1;
+    aba.getRange(linha, P.TOKEN).setValue(novoToken);
+    aba.getRange(linha, P.TOKEN_USADO).setValue("nao");
+    aba.getRange(linha, P.LINK_CHECKIN).setValue(linkCheckin);
+    aba.getRange(linha, P.DATA_DISPARO).setValue(hoje);
+    aba.getRange(linha, P.LINK_WHATSAPP).setValue(linkWhatsapp);
+
+    if (!dryRun) {
+      const res = enviarWhatsApp(telefone, mensagem, baseUrl, instanceId, apiToken);
+      if (res.ok) {
+        enviados++;
+      } else {
+        erros.push({ paciente: nome, codigo, erro: res.erro });
+      }
+      Utilities.sleep(1500);
+    } else {
+      Logger.log("[DRY RUN] " + nome + " → " + telefone + "\n" + linkCheckin);
+      enviados++;
     }
-    const dieta = resp ? parseInt(resp[6]) : null;
-    const exercicio = resp ? parseFloat(resp[8]) || 0 : null;
-    const nrTag = !resp ? '<span class="badge badge-nr" style="margin-left:4px">Sem resposta</span>' : '';
-    // Paciente inativo: badge cinza; ativo: lógica normal
-    const inativo = !estaAtivo(p);
-    const statusClass = inativo ? 'badge-inativo' : (!resp ? 'badge-warn' : (dieta < 4 || exercicio < 3) ? 'badge-alert' : 'badge-ok');
-    const statusLabel = inativo ? 'Inativo' : (!resp ? 'Pendente' : (dieta < 4 || exercicio < 3) ? 'Alerta' : 'Estável');
-    return `<tr class="clickable" onclick="abrirDetalhe('${p[0]}')">
-      <td><span style="font-weight:500${inativo ? ';color:#a0a09a' : ''}">${p[1]}</span>${nrTag}</td>
-      <td><span class="badge ${diagClass}">${p[2] || '—'}</span></td>
-      <td>${peso}</td>
-      <td style="${varColor};font-weight:500">${variacao}</td>
-      <td>${dieta !== null ? `<div class="bar-wrap"><div class="bar-fill" style="width:${dieta*10}%;background:#1D9E75"></div></div><span style="font-size:11px;color:#6b6b67">${dieta}/10</span>` : '—'}</td>
-      <td>${exercicio !== null ? `<div class="bar-wrap"><div class="bar-fill" style="width:${(exercicio/7)*100}%;background:#534AB7"></div></div><span style="font-size:11px;color:#6b6b67">${resp[8]}x/sem</span>` : '—'}</td>
-      <td><span class="badge ${statusClass}">${statusLabel}</span></td>
-    </tr>`;
-  }).join('');
+  }
+
+  return {
+    ok: true,
+    dryRun,
+    enviados,
+    pulados,
+    total: dados.length - 1,
+    erros,
+    data: Utilities.formatDate(hoje, "America/Fortaleza", "dd/MM/yyyy"),
+  };
 }
-function renderAlertas() {
-  // Alertas apenas para pacientes ativos
-  const pacientes = dadosGlobal.pacientes.slice(1).filter(p => p[0] && estaAtivo(p));
-  const alertas = pacientes.filter(p => {
-    const resp = ultimaResposta(p[0]);
-    if (!resp) return true;
-    return parseInt(resp[6]) < 4 || parseFloat(resp[8]) || 0 < 1.5;
-  });
-  const el = document.getElementById('alertas-list');
-  if (!alertas.length) { el.innerHTML = '<p class="empty">Nenhum alerta no momento.</p>'; return; }
-  el.innerHTML = alertas.slice(0, 5).map(p => {
-    const resp = ultimaResposta(p[0]);
-    const tipo = !resp ? 'warn' : 'danger';
-    const icon = !resp ? '⚠️' : '🔴';
-    const msg = !resp ? 'Não respondeu ao check-in' : `Dieta ${resp[6]}/10 · Exercício ${resp[8]}x/semana`;
-    return `<div class="alert-row" style="cursor:pointer" onclick="abrirDetalhe('${p[0]}')">
-      <div class="alert-icon ${tipo}">${icon}</div>
-      <div class="alert-text"><p style="font-weight:500">${p[1]}</p><span>${msg}</span></div>
-      <span style="font-size:12px;color:#6b6b67">Ver →</span>
-    </div>`;
-  }).join('');
+
+// ============================================================
+// INTEGRAÇÃO UAZAPI — envia mensagem WhatsApp
+// Docs: https://docs.uazapi.com
+// ============================================================
+function enviarWhatsApp(telefone, mensagem, baseUrl, instanceId, token) {
+  // O token no header já identifica a instância — instanceId não vai no path                                                                                        
+  const url = baseUrl.replace(/\/$/, "") + "/send/text";
+  try {
+    const resp = UrlFetchApp.fetch(url, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+        "token": token,
+      },
+      payload: JSON.stringify({
+        number:  telefone,   // formato: 5585998103840
+        text:    mensagem,
+      }),
+      muteHttpExceptions: true,
+    });
+
+    const code = resp.getResponseCode();
+    let body   = {};
+    try { body = JSON.parse(resp.getContentText()); } catch (_) {}
+
+    return (code >= 200 && code < 300)
+      ? { ok: true }
+      : { ok: false, erro: body.message || body.error || "HTTP " + code };
+  } catch (err) {
+    return { ok: false, erro: err.message };
+  }
 }
-function renderGrafico() {
-  const respostas = dadosGlobal.respostas.slice(1).filter(r => r[0] && r[6]).sort((a, b) => new Date(a[0]) - new Date(b[0]));
-  const ultimas = respostas.slice(-8);
-  const labels = ultimas.map(r => new Date(r[0]).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
-  const dietas = ultimas.map(r => parseFloat(r[6]) || 0);
-  const exercicios = ultimas.map(r => parseFloat(r[8]) || 0);
-  if (chartAdesao) chartAdesao.destroy();
-  const ctx = document.getElementById('chartAdesao').getContext('2d');
-  chartAdesao = new Chart(ctx, {
-    type: 'line',
-    data: { labels, datasets: [
-      { label: 'Dieta (0-10)', data: dietas, borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', tension: 0.4, pointRadius: 4, pointBackgroundColor: '#1D9E75', borderWidth: 2, yAxisID: 'y' },
-      { label: 'Dias/sem (0-7)', data: exercicios, borderColor: '#534AB7', backgroundColor: 'rgba(83,74,183,0.08)', tension: 0.4, pointRadius: 4, pointBackgroundColor: '#534AB7', borderWidth: 2, yAxisID: 'y2' }
-    ]},
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-      scales: {
-        y:  { min: 0, max: 10, position: 'left',  ticks: { stepSize: 2, font: { size: 11 } }, grid: { color: 'rgba(128,128,128,0.1)' } },
-        y2: { min: 0, max: 7,  position: 'right', ticks: { stepSize: 1, font: { size: 11 } }, grid: { display: false } },
-        x:  { ticks: { font: { size: 11 } }, grid: { display: false } }
+
+// ============================================================
+// GRAVA RESPOSTA NA ABA "respostas"
+// ============================================================
+function gravarResposta(dados, paciente) {
+  const ss  = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  const aba = ss.getSheetByName(CONFIG.ABA_RESPOSTAS);
+
+  aba.appendRow([
+    new Date(),
+    paciente.codigo,
+    paciente.nome,
+    paciente.diagnostico,
+    dados.peso              || "",
+    dados.sentimento_peso   || "",
+    dados.dieta             || "",
+    (dados.dificuldades_dieta || []).join(", "),
+    dados.dias_exercicio    || "",
+    dados.intensidade       || "",
+    dados.tipo_exercicio    || "",
+    dados.medicacao         || "",
+    dados.efeitos_colaterais || "",
+    (dados.sintomas         || []).join(", "),
+    dados.bem_estar         || "",
+    dados.duvidas           || "",
+  ]);
+}
+
+// ============================================================
+// BUSCA PACIENTE PELO TOKEN
+// ============================================================
+function buscarPacientePorToken(token) {
+  if (!token) return null;
+  const ss    = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  const aba   = ss.getSheetByName(CONFIG.ABA_PACIENTES);
+  const dados = aba.getDataRange().getValues();
+
+  for (let i = 1; i < dados.length; i++) {
+    if (dados[i][P.TOKEN - 1] === token && dados[i][P.TOKEN_USADO - 1] !== "sim") {
+      return {
+        linha:       i + 1,
+        codigo:      dados[i][P.CODIGO - 1],
+        nome:        dados[i][P.NOME - 1],
+        diagnostico: dados[i][P.DIAGNOSTICO - 1],
+        whatsapp:    dados[i][P.WHATSAPP - 1],
+      };
+    }
+  }
+  return null;
+}
+
+// ============================================================
+// INVALIDA TOKEN APÓS USO
+// ============================================================
+function invalidarToken(linha) {
+  const ss  = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  const aba = ss.getSheetByName(CONFIG.ABA_PACIENTES);
+  aba.getRange(linha, P.TOKEN_USADO).setValue("sim");
+}
+
+// ============================================================
+// VERIFICA ALERTAS — pacientes sem resposta há mais de N dias
+// ============================================================
+function verificarAlertas() {
+  const ss            = SpreadsheetApp.openById(CONFIG.SHEET_ID);
+  const abaPacientes  = ss.getSheetByName(CONFIG.ABA_PACIENTES);
+  const abaRespostas  = ss.getSheetByName(CONFIG.ABA_RESPOSTAS);
+  const pacientes     = abaPacientes.getDataRange().getValues();
+  const respostas     = abaRespostas.getDataRange().getValues();
+  const agora         = new Date();
+  const alertas       = [];
+
+  for (let i = 1; i < pacientes.length; i++) {
+    const codigo      = pacientes[i][P.CODIGO - 1];
+    const nome        = pacientes[i][P.NOME - 1];
+    const dataDisparo = pacientes[i][P.DATA_DISPARO - 1];
+
+    if (!dataDisparo || !codigo) continue;
+
+    let ultimaResposta = null;
+    for (let j = 1; j < respostas.length; j++) {
+      if (respostas[j][1] === codigo) {
+        const dataResp = new Date(respostas[j][0]);
+        if (!ultimaResposta || dataResp > ultimaResposta) ultimaResposta = dataResp;
       }
     }
-  });
-}
-// ---- DETALHE DO PACIENTE ----
-function abrirDetalhe(codigo) {
-  const paciente = dadosGlobal.pacientes.slice(1).find(p => p[0] === codigo);
-  if (!paciente) return;
-  const respostas = todasRespostasPaciente(codigo);
-  document.getElementById('tela-principal').style.display = 'none';
-  document.getElementById('tela-detalhe').style.display = 'block';
-  document.getElementById('det-nome').textContent = paciente[1];
-  const statusLabel = estaAtivo(paciente) ? 'Ativo' : 'Inativo';
-  document.getElementById('det-meta').textContent = `${paciente[2]} · Código: ${paciente[0]} · ${statusLabel} · ${respostas.length} check-in(s) registrado(s)`;
-  // Métricas rápidas
-  const ultima = respostas.length ? respostas[respostas.length - 1] : null;
-  const primeira = respostas.length ? respostas[0] : null;
-  const variacaoTotal = (primeira && ultima && primeira !== ultima) ? (parseFloat(ultima[4]) - parseFloat(primeira[4])).toFixed(1) : null;
-  const varSign = variacaoTotal > 0 ? '+' : '';
-  document.getElementById('det-metrics').innerHTML = `
-    <div class="metric"><p class="metric-label">Último peso</p><p class="metric-val">${ultima ? parseFloat(ultima[4]).toFixed(1) + ' kg' : '—'}</p><p class="metric-sub">check-in mais recente</p></div>
-    <div class="metric"><p class="metric-label">Variação total</p><p class="metric-val" style="color:${variacaoTotal < 0 ? '#0F6E56' : variacaoTotal > 0 ? '#A32D2D' : '#1a1a18'}">${variacaoTotal !== null ? varSign + variacaoTotal + ' kg' : '—'}</p><p class="metric-sub">desde o primeiro check-in</p></div>
-    <div class="metric"><p class="metric-label">Adesão dieta</p><p class="metric-val">${ultima ? ultima[6] + '/10' : '—'}</p><p class="metric-sub">último check-in</p></div>
-    <div class="metric"><p class="metric-label">Exercício</p><p class="metric-val">${ultima ? ultima[8] + 'x/sem' : '—'}</p><p class="metric-sub">último check-in</p></div>
-    <div class="metric"><p class="metric-label">Bem-estar</p><p class="metric-val">${ultima ? ultima[14] + '/10' : '—'}</p><p class="metric-sub">último check-in</p></div>
-  `;
-  // Gráfico de peso
-  const labels = respostas.map(r => new Date(r[0]).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
-  const pesos = respostas.map(r => parseFloat(r[4]) || null);
-  if (chartPeso) chartPeso.destroy();
-  chartPeso = new Chart(document.getElementById('chartPeso').getContext('2d'), {
-    type: 'line',
-    data: { labels, datasets: [{ label: 'Peso (kg)', data: pesos, borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', tension: 0.4, pointRadius: 5, pointBackgroundColor: '#1D9E75', borderWidth: 2 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-      scales: { y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(128,128,128,0.1)' } }, x: { ticks: { font: { size: 11 } }, grid: { display: false } } } }
-  });
-  // Gráfico de adesão
-  if (chartAdesaoDet) chartAdesaoDet.destroy();
-  chartAdesaoDet = new Chart(document.getElementById('chartAdesaoDet').getContext('2d'), {
-    type: 'line',
-    data: { labels, datasets: [
-      { label: 'Dieta (0-10)', data: respostas.map(r => parseFloat(r[6]) || 0), borderColor: '#1D9E75', backgroundColor: 'rgba(29,158,117,0.08)', tension: 0.4, pointRadius: 4, pointBackgroundColor: '#1D9E75', borderWidth: 2, yAxisID: 'y' },
-      { label: 'Dias/sem (0-7)', data: respostas.map(r => parseFloat(r[8]) || 0), borderColor: '#534AB7', backgroundColor: 'rgba(83,74,183,0.08)', tension: 0.4, pointRadius: 4, pointBackgroundColor: '#534AB7', borderWidth: 2, yAxisID: 'y2' }
-    ]},
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-      scales: {
-        y:  { min: 0, max: 10, position: 'left',  ticks: { stepSize: 2, font: { size: 11 } }, grid: { color: 'rgba(128,128,128,0.1)' } },
-        y2: { min: 0, max: 7,  position: 'right', ticks: { stepSize: 1, font: { size: 11 } }, grid: { display: false } },
-        x:  { ticks: { font: { size: 11 } }, grid: { display: false } }
-      }
+
+    const diasSemResposta = (agora - (ultimaResposta || new Date(dataDisparo))) / 86400000;
+
+    if (diasSemResposta >= CONFIG.DIAS_SEM_RESPOSTA && !ultimaResposta) {
+      alertas.push({ codigo, nome, diasSemResposta: Math.floor(diasSemResposta) });
     }
-  });
-  // Histórico de check-ins (mais recente primeiro)
-  const checkins = [...respostas].reverse();
-  document.getElementById('det-checkins').innerHTML = checkins.length ? checkins.map(r => {
-    const data = new Date(r[0]).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const efeitos = r[12] ? r[12] : '—';
-    const duvida = r[15] ? `<div class="duvida-box">💬 "${r[15]}"</div>` : '';
-    return `<div class="checkin-card">
-      <p class="checkin-data">${data}</p>
-      <div class="checkin-grid">
-        <div class="checkin-item"><p class="label">Peso</p>${parseFloat(r[4]).toFixed(1)} kg</div>
-        <div class="checkin-item"><p class="label">Percepção peso</p>${r[5] || '—'}</div>
-        <div class="checkin-item"><p class="label">Adesão dieta</p>${r[6]}/10</div>
-        <div class="checkin-item"><p class="label">Dificuldades dieta</p>${r[7] || '—'}</div>
-        <div class="checkin-item"><p class="label">Dias exercício/sem</p>${r[8] || '—'}</div>
-        <div class="checkin-item"><p class="label">Tipo exercício</p>${r[10] || '—'}</div>
-        <div class="checkin-item"><p class="label">Medicação</p>${r[11] || '—'}</div>
-        <div class="checkin-item"><p class="label">Efeitos colaterais</p>${efeitos}</div>
-        <div class="checkin-item"><p class="label">Bem-estar geral</p>${r[14]}/10</div>
-      </div>
-      ${duvida}
-    </div>`;
-  }).join('') : '<p class="empty">Nenhum check-in registrado ainda.</p>';
+  }
+
+  if (alertas.length > 0) enviarEmailAlerta(alertas);
 }
-function voltarLista() {
-  document.getElementById('tela-detalhe').style.display = 'none';
-  document.getElementById('tela-principal').style.display = 'block';
+
+// ============================================================
+// ENVIA E-MAIL DE ALERTA
+// ============================================================
+function enviarEmailAlerta(alertas) {
+  const linhas = alertas.map(a =>
+    `• ${a.nome} (${a.codigo}) — ${a.diasSemResposta} dia(s) sem resposta`
+  ).join("\n");
+
+  GmailApp.sendEmail(
+    CONFIG.EMAIL_ALERTA,
+    `[Acompanhamento] ${alertas.length} paciente(s) sem resposta`,
+    `Dra. Ivana,\n\nOs seguintes pacientes ainda não responderam ao check-in:\n\n${linhas}\n\nAcesse o dashboard para mais detalhes.\n\nSistema de Acompanhamento Automático`
+  );
 }
-carregarDados();
-</script>
-</body>
-</html>
+
+// ============================================================
+// TESTES MANUAIS — execute diretamente no Apps Script
+// ============================================================
+function testarEnvio() {
+  // Dry run: só loga, não envia e não atualiza planilha
+  const r = cicloLembretes(true);
+  Logger.log(JSON.stringify(r, null, 2));
+}
+
+function dispararEnvioManual() {
+  // Envia de verdade — confirme antes de executar
+  const r = cicloLembretes(false);
+  Logger.log(JSON.stringify(r, null, 2));
+}
+
+// ============================================================
+// UTILITÁRIO
+// ============================================================
+function resposta(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
