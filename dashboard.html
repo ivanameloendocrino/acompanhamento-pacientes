@@ -120,6 +120,7 @@
         <button class="filter-btn" onclick="filtrar('Obesidade',this)">Obesidade</button>
         <button class="filter-btn" onclick="filtrar('Ambos',this)">Ambos</button>
         <button class="filter-btn" onclick="filtrar('alerta',this)">⚠ Alertas</button>
+        <button class="filter-btn" onclick="filtrar('semresp',this)">📭 Sem resposta ao último disparo</button>
         <button class="filter-btn inativo-btn" onclick="filtrar('Inativo',this)">Inativos</button>
       </div>
       <div class="card">
@@ -211,14 +212,22 @@ async function carregarDados() {
   document.getElementById('loading').style.display = 'block';
   document.getElementById('conteudo').style.display = 'none';
   try {
-    const resp = await fetch(SCRIPT_URL + "?acao=dados");
+    let senha = '';
+    try { senha = sessionStorage.getItem('senhaDashboard') || ''; } catch(e) {}
+    if (!senha) senha = prompt('Senha do painel:') || '';
+    const resp = await fetch(SCRIPT_URL + "?acao=dados&senha=" + encodeURIComponent(senha));
     const data = await resp.json();
+    if (data.ok === false) {
+      try { sessionStorage.removeItem('senhaDashboard'); } catch(e) {}
+      throw new Error(data.erro || 'Não autorizado');
+    }
+    try { sessionStorage.setItem('senhaDashboard', senha); } catch(e) {}
     dadosGlobal = data;
     renderTudo();
     document.getElementById('loading').style.display = 'none';
     document.getElementById('conteudo').style.display = 'block';
   } catch(err) {
-    document.getElementById('loading').textContent = 'Erro ao carregar dados. Verifique se o Apps Script está publicado corretamente.';
+    document.getElementById('loading').textContent = 'Senha incorreta ou erro ao carregar os dados. Clique em ⟳ Atualizar para tentar de novo.';
   }
   btn.disabled = false;
   btn.textContent = '⟳ Atualizar';
@@ -245,6 +254,16 @@ function ultimaResposta(codigo) {
 }
 // Retorna true se o paciente está ativo (coluna J da planilha = p[9])
 // Pacientes sem valor na coluna Status são tratados como Ativos
+// Sem resposta ao último disparo: houve disparo (coluna H = p[7])
+// e o link desse disparo ainda não foi usado (coluna F = p[5] diferente de "sim")
+function semRespostaUltimoDisparo(p) {
+  if (!p[7]) return false;
+  return String(p[5] || '').trim().toLowerCase() !== 'sim';
+}
+function formatarData(v) {
+  const dt = new Date(v);
+  return isNaN(dt) ? '' : dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+}
 function estaAtivo(p) {
   return !p[9] || p[9].trim().toLowerCase() !== 'inativo';
 }
@@ -257,17 +276,18 @@ function renderTabela() {
     // Todos os outros filtros: mostrar apenas ativos
     if (!ativo) return false;
     if (filtroAtual === 'todos') return true;
+    if (filtroAtual === 'semresp') return semRespostaUltimoDisparo(p);
     if (filtroAtual === 'alerta') {
       const resp = ultimaResposta(p[0]);
       if (!resp) return true;
-      return parseInt(resp[6]) < 4 || parseFloat(resp[8]) || 0 < 1.5;
+      return parseInt(resp[6]) < 4 || (parseFloat(resp[8]) || 0) < 1.5;
     }
     return p[2] === filtroAtual;
   });
   const responderam = lista.filter(p => ultimaResposta(p[0]));
   const nResp = lista.length - responderam.length;
   const adDieta = responderam.length ? responderam.reduce((s, p) => { const r = ultimaResposta(p[0]); return s + (parseFloat(r[6]) || 0); }, 0) / responderam.length : 0;
-  const adEx = responderam.length ? responderam.reduce((s, p) => { const r = ultimaResposta(p[0]); return s + parseFloat(r[8]) || 0; }, 0) / responderam.length : 0;
+  const adEx = responderam.length ? responderam.reduce((s, p) => { const r = ultimaResposta(p[0]); return s + (parseFloat(r[8]) || 0); }, 0) / responderam.length : 0;
   document.getElementById('m-total').textContent = filtroAtual === 'Inativo' ? lista.length : pacientes.filter(estaAtivo).length;
   document.getElementById('m-resp').textContent = responderam.length;
   document.getElementById('m-resp-pct').textContent = lista.length ? Math.round(responderam.length / lista.length * 100) + '% de taxa' : '';
@@ -275,7 +295,7 @@ function renderTabela() {
   document.getElementById('m-ades').textContent = responderam.length ? ((adDieta + adEx) / 2).toFixed(1) + '/10' : '—';
   const tbody = document.getElementById('pt-body');
   if (!lista.length) {
-    tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum paciente ' + (filtroAtual === 'Inativo' ? 'inativo' : 'cadastrado') + ' ainda.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">Nenhum paciente ' + (filtroAtual === 'Inativo' ? 'inativo' : filtroAtual === 'semresp' ? 'pendente — todos responderam ao último disparo' : 'cadastrado') + ' ainda.</td></tr>';
     return;
   }
   tbody.innerHTML = lista.map(p => {
@@ -291,7 +311,9 @@ function renderTabela() {
     }
     const dieta = resp ? parseInt(resp[6]) : null;
     const exercicio = resp ? parseFloat(resp[8]) || 0 : null;
-    const nrTag = !resp ? '<span class="badge badge-nr" style="margin-left:4px">Sem resposta</span>' : '';
+    const nrTag = (filtroAtual === 'semresp')
+      ? '<span class="badge badge-nr" style="margin-left:4px">Disparo de ' + formatarData(p[7]) + ' sem resposta</span>'
+      : (!resp ? '<span class="badge badge-nr" style="margin-left:4px">Sem resposta</span>' : '');
     // Paciente inativo: badge cinza; ativo: lógica normal
     const inativo = !estaAtivo(p);
     const statusClass = inativo ? 'badge-inativo' : (!resp ? 'badge-warn' : (dieta < 4 || exercicio < 3) ? 'badge-alert' : 'badge-ok');
@@ -313,7 +335,7 @@ function renderAlertas() {
   const alertas = pacientes.filter(p => {
     const resp = ultimaResposta(p[0]);
     if (!resp) return true;
-    return parseInt(resp[6]) < 4 || parseFloat(resp[8]) || 0 < 1.5;
+    return parseInt(resp[6]) < 4 || (parseFloat(resp[8]) || 0) < 1.5;
   });
   const el = document.getElementById('alertas-list');
   if (!alertas.length) { el.innerHTML = '<p class="empty">Nenhum alerta no momento.</p>'; return; }
