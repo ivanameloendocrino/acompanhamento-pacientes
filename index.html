@@ -3,409 +3,273 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Viva Leve - Dra. Ivana Melo</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Minha evolução - Viva Leve</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #f5f5f3;
-      color: #1a1a18;
-      font-size: 16px;
-      line-height: 1.6;
+      background: #f5f5f3; color: #1a1a18; font-size: 16px; line-height: 1.6;
       padding: 1.5rem 1rem 3rem;
     }
-
     .wrap { max-width: 600px; margin: 0 auto; }
-
     .header {
-      background: #fff;
-      border: 1px solid #e8e8e4;
-      border-radius: 12px;
-      padding: 1.25rem;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 14px;
+      background: #fff; border: 1px solid #e8e8e4; border-radius: 12px;
+      padding: 1.25rem; margin-bottom: 1rem; display: flex; align-items: center; gap: 14px;
     }
     .avatar {
-      width: 48px; height: 48px; border-radius: 50%;
-      background: #E1F5EE;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; font-size: 22px;
+      width: 48px; height: 48px; border-radius: 50%; background: #E1F5EE;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 22px;
     }
-    .header-text .title { font-size: 15px; font-weight: 600; color: #1a1a18; }
-    .header-text .sub { font-size: 13px; color: #6b6b67; margin-top: 2px; }
+    .header .title { font-size: 15px; font-weight: 600; }
+    .header .sub { font-size: 13px; color: #6b6b67; margin-top: 2px; }
     .badge {
-      display: inline-block; margin-top: 6px;
-      background: #E1F5EE; color: #085041;
-      font-size: 12px; font-weight: 500;
-      padding: 3px 10px; border-radius: 6px;
+      display: inline-block; margin-top: 6px; background: #E1F5EE; color: #085041;
+      font-size: 12px; font-weight: 500; padding: 3px 10px; border-radius: 6px;
     }
-
     .card {
-      background: #fff;
-      border: 1px solid #e8e8e4;
-      border-radius: 12px;
-      padding: 1.25rem;
-      margin-bottom: 1rem;
+      background: #fff; border: 1px solid #e8e8e4; border-radius: 12px;
+      padding: 1.25rem; margin-bottom: 1rem;
     }
     .card-title {
-      font-size: 12px; font-weight: 600;
-      color: #6b6b67; text-transform: uppercase;
+      font-size: 12px; font-weight: 600; color: #6b6b67; text-transform: uppercase;
       letter-spacing: .05em; margin-bottom: 1rem;
     }
-
-    .field { margin-bottom: 1rem; }
-    .field:last-child { margin-bottom: 0; }
-    .field label { display: block; font-size: 14px; color: #6b6b67; margin-bottom: 6px; }
-
-    input[type=text], input[type=number], textarea, select {
-      width: 100%; padding: 9px 12px;
-      border: 1px solid #ddd; border-radius: 8px;
-      font-size: 15px; font-family: inherit;
-      background: #fafafa; color: #1a1a18;
-      transition: border-color .15s;
-      outline: none;
+    .card-note { font-size: 13px; color: #6b6b67; margin-top: .5rem; }
+    label { display: block; font-size: 14px; color: #3d3d3a; margin-bottom: .5rem; }
+    input[type=text] {
+      width: 100%; font-size: 22px; letter-spacing: .4em; text-align: center;
+      padding: .6rem; border: 1px solid #d3d3cf; border-radius: 10px; background: #fff;
+      color: #1a1a18;
     }
-    input[type=text]:focus, input[type=number]:focus, textarea:focus {
-      border-color: #1D9E75; background: #fff;
+    input[type=text]:focus { outline: 2px solid #1D9E75; border-color: #1D9E75; }
+    .btn {
+      width: 100%; margin-top: 1rem; padding: .85rem; border: none; border-radius: 10px;
+      background: #1D9E75; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer;
     }
-    textarea { resize: vertical; min-height: 80px; }
-
-    .scale-row { display: flex; align-items: center; gap: 10px; }
-    .scale-row input[type=range] { flex: 1; accent-color: #1D9E75; }
-    .scale-val { font-size: 15px; font-weight: 600; min-width: 30px; text-align: right; color: #1a1a18; }
-    .scale-labels { display: flex; justify-content: space-between; margin-top: 4px; }
-    .scale-labels span { font-size: 11px; color: #a0a09a; }
-
-    .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
-    .radio-group label {
-      display: flex; align-items: center; gap: 7px;
-      font-size: 14px; color: #1a1a18; cursor: pointer;
-      background: #f5f5f3; border: 1px solid #e0e0db;
-      border-radius: 8px; padding: 7px 13px;
-      transition: border-color .15s, background .15s;
+    .btn:hover { background: #0F6E56; }
+    .btn:disabled { background: #9FE1CB; cursor: not-allowed; }
+    .erro {
+      display: none; margin-top: .75rem; font-size: 14px; color: #A32D2D;
+      background: #FCEBEB; border-radius: 8px; padding: .6rem .8rem;
     }
-    .radio-group label:has(input:checked) {
-      background: #E1F5EE; border-color: #5DCAA5; color: #085041;
-    }
-    .radio-group input[type=radio] { accent-color: #1D9E75; margin: 0; }
-
-    .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .check-item {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 14px; color: #1a1a18; cursor: pointer;
-      background: #f5f5f3; border: 1px solid #e0e0db;
-      border-radius: 8px; padding: 8px 12px;
-      transition: border-color .15s, background .15s;
-    }
-    .check-item:has(input:checked) {
-      background: #E1F5EE; border-color: #5DCAA5; color: #085041;
-    }
-    .check-item input { accent-color: #1D9E75; margin: 0; }
-
-    .btn-submit {
-      width: 100%; padding: 13px;
-      background: #1D9E75; color: #fff;
-      border: none; border-radius: 10px;
-      font-size: 15px; font-weight: 600;
-      cursor: pointer; margin-top: .5rem;
-      transition: background .15s;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-    }
-    .btn-submit:hover { background: #0F6E56; }
-    .btn-submit:disabled { background: #9FE1CB; cursor: not-allowed; }
-
-    .spinner {
-      width: 18px; height: 18px;
-      border: 2px solid rgba(255,255,255,.4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .success {
-      display: none;
-      background: #E1F5EE; border: 1px solid #5DCAA5;
-      border-radius: 12px; padding: 2rem;
-      text-align: center; margin-top: 1rem;
-    }
-    .success .icon { font-size: 40px; margin-bottom: .75rem; }
-    .success h2 { font-size: 18px; color: #085041; margin-bottom: .5rem; }
-    .success p { font-size: 14px; color: #0F6E56; }
-
-    .error-msg {
-      display: none;
-      background: #FCEBEB; border: 1px solid #F09595;
-      border-radius: 8px; padding: .875rem 1rem;
-      font-size: 14px; color: #791F1F;
-      margin-top: .5rem;
-    }
-
-    @media (max-width: 480px) {
-      .check-grid { grid-template-columns: 1fr; }
-      .radio-group label { font-size: 13px; padding: 6px 10px; }
-    }
+    .ola { font-size: 20px; font-weight: 600; margin-bottom: .25rem; }
+    .ola-sub { font-size: 14px; color: #6b6b67; margin-bottom: 1rem; }
+    .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: .75rem; margin-bottom: 1rem; }
+    .metric { background: #fff; border: 1px solid #e8e8e4; border-radius: 12px; padding: .9rem 1rem; }
+    .metric-label { font-size: 12px; color: #6b6b67; }
+    .metric-val { font-size: 22px; font-weight: 600; line-height: 1.3; }
+    .metric-sub { font-size: 12px; color: #6b6b67; }
+    .destaques { list-style: none; }
+    .destaques li { display: flex; gap: .6rem; font-size: 15px; padding: .45rem 0; border-bottom: 1px solid #f0f0ec; }
+    .destaques li:last-child { border-bottom: none; }
+    .chart-box { position: relative; height: 200px; }
+    .med-linha { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .med-item { text-align: center; font-size: 12px; color: #6b6b67; min-width: 52px; }
+    .med-item span { display: block; font-size: 20px; }
+    .legenda { font-size: 12px; color: #6b6b67; margin-top: .75rem; }
+    .vazio { text-align: center; color: #6b6b67; font-size: 15px; padding: 1rem 0; }
+    .rodape { font-size: 12px; color: #8a8a85; text-align: center; margin-top: 1.5rem; }
+    #resultado { display: none; }
   </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="header">
-    <div class="avatar">🩺</div>
-    <div class="header-text">
-      <div class="title">Viva Leve</div>
-      <div class="sub">Dra. Ivana Melo - Endocrinologista / RQE 9775</div>
-      <span class="badge">📅 Check-in de 15 dias</span>
+    <div class="avatar">📈</div>
+    <div>
+      <p class="title">Minha evolução</p>
+      <p class="sub">Dra. Ivana Melo · Endocrinologia</p>
+      <span class="badge">Viva Leve</span>
     </div>
   </div>
 
-  <div id="form-body">
+  <!-- Confirmação de identidade -->
+  <div class="card" id="confirmacao">
+    <p class="card-title">🔒 Acesso seguro</p>
+    <label for="digitos">Para proteger seus dados, digite os <strong>4 últimos dígitos do seu celular</strong>:</label>
+    <input type="text" id="digitos" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••" />
+    <button class="btn" id="btn-ver" onclick="carregar()">Ver minha evolução</button>
+    <div class="erro" id="erro"></div>
+    <p class="card-note">Este link é pessoal. Por favor, não compartilhe.</p>
+  </div>
 
-    <div class="card">
-      <p class="card-title">👤 Identificação</p>
-      <div class="field">
-        <label for="nome">Nome completo</label>
-        <input type="text" id="nome" placeholder="Seu nome completo" autocomplete="name" />
-      </div>
-      <div class="field" id="campo-codigo" style="display:none">
-        <label for="codigo">Código do paciente</label>
-        <input type="text" id="codigo" placeholder="Ex: OB-2024-042" />
-      </div>
+  <!-- Resultado -->
+  <div id="resultado">
+    <p class="ola" id="ola"></p>
+    <p class="ola-sub" id="ola-sub"></p>
+
+    <div class="metrics" id="metrics"></div>
+
+    <div class="card" id="card-destaques">
+      <p class="card-title">🌟 Seus destaques</p>
+      <ul class="destaques" id="destaques"></ul>
+    </div>
+
+    <div class="card" id="card-peso">
+      <p class="card-title">⚖️ Peso</p>
+      <div class="chart-box"><canvas id="chartPeso"></canvas></div>
     </div>
 
     <div class="card">
-      <p class="card-title">⚖️ Peso atual</p>
-      <div class="field">
-        <label for="peso">Peso hoje (kg)</label>
-        <input type="number" id="peso" placeholder="Ex: 87.5" step="0.1" min="30" max="300" />
-      </div>
-      <div class="field">
-        <label>Como você se sente em relação ao seu peso?</label>
-        <div class="radio-group">
-          <label><input type="radio" name="sentimento_peso" value="baixou"> Baixou</label>
-          <label><input type="radio" name="sentimento_peso" value="estavel"> Estável</label>
-          <label><input type="radio" name="sentimento_peso" value="aumentou"> Aumentou</label>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <p class="card-title">🥗 Adesão à dieta</p>
-      <div class="field">
-        <label>Quanto seguiu o plano alimentar nas últimas 2 semanas? <span id="dieta-val" style="font-weight:600;color:#1a1a18">5</span>/10</label>
-        <div class="scale-row">
-          <input type="range" id="dieta" min="1" max="10" value="5" step="1"
-            oninput="document.getElementById('dieta-val').textContent=this.value" />
-          <span class="scale-val" id="dieta-val2">5</span>
-        </div>
-        <div class="scale-labels"><span>Não segui</span><span>Segui perfeitamente</span></div>
-      </div>
-      <div class="field">
-        <label>Dificuldades encontradas</label>
-        <div class="check-grid">
-          <label class="check-item"><input type="checkbox" value="social"> Eventos sociais</label>
-          <label class="check-item"><input type="checkbox" value="ansiedade"> Ansiedade/estresse</label>
-          <label class="check-item"><input type="checkbox" value="tempo"> Falta de tempo</label>
-          <label class="check-item"><input type="checkbox" value="acesso"> Acesso a alimentos</label>
-          <label class="check-item"><input type="checkbox" value="fome"> Fome excessiva</label>
-          <label class="check-item"><input type="checkbox" value="nenhuma"> Nenhuma</label>
-        </div>
-      </div>
+      <p class="card-title">🥗 Seguimento do plano alimentar</p>
+      <div class="chart-box"><canvas id="chartDieta"></canvas></div>
+      <p class="legenda">Escala de 1 (não segui) a 10 (segui perfeitamente)</p>
     </div>
 
     <div class="card">
       <p class="card-title">🏃 Atividade física</p>
-      <div class="field">
-        <label>Dias de exercício por semana: <span id="dias-val" style="font-weight:600;color:#1a1a18">0</span> dias</label>
-        <div class="scale-row">
-          <input type="range" id="dias_exercicio" min="0" max="7" value="0" step="1"
-            oninput="document.getElementById('dias-val').textContent=this.value" />
-        </div>
-        <div class="scale-labels"><span>Nenhum</span><span>Todos os dias</span></div>
-      </div>
-      <div class="field">
-        <label>Intensidade média: <span id="int-val" style="font-weight:600;color:#1a1a18">5</span>/10</label>
-        <div class="scale-row">
-          <input type="range" id="intensidade" min="1" max="10" value="5" step="1"
-            oninput="document.getElementById('int-val').textContent=this.value" />
-        </div>
-        <div class="scale-labels"><span>Muito leve</span><span>Muito intensa</span></div>
-      </div>
-      <div class="field">
-        <label>Tipo de atividade principal</label>
-        <div class="radio-group">
-          <label><input type="radio" name="tipo_ex" value="caminhada"> Caminhada</label>
-          <label><input type="radio" name="tipo_ex" value="musculacao"> Musculação</label>
-          <label><input type="radio" name="tipo_ex" value="natacao"> Natação</label>
-          <label><input type="radio" name="tipo_ex" value="bike"> Bicicleta</label>
-          <label><input type="radio" name="tipo_ex" value="crossfit"> Crossfit</label>
-          <label><input type="radio" name="tipo_ex" value="corrida"> Corrida</label>
-          <label><input type="radio" name="tipo_ex" value="outro"> Outro</label>
-        </div>
-      </div>
+      <div class="chart-box"><canvas id="chartExercicio"></canvas></div>
+      <p class="legenda">Dias de exercício por semana</p>
     </div>
 
     <div class="card">
-      <p class="card-title">💊 Medicação</p>
-      <div class="field">
-        <label>Tomou a medicação conforme prescrito?</label>
-        <div class="radio-group">
-          <label><input type="radio" name="medicacao" value="sim"> Sim</label>
-          <label><input type="radio" name="medicacao" value="quase"> Quase sempre</label>
-          <label><input type="radio" name="medicacao" value="nao"> Não consegui</label>
-        </div>
-      </div>
-      <div class="field">
-        <label>Apresentou algum destes efeitos colaterais?</label>
-        <div class="check-grid">
-          <label class="check-item"><input type="checkbox" class="efeito" value="nausea"> Náusea</label>
-          <label class="check-item"><input type="checkbox" class="efeito" value="refluxo"> Refluxo</label>
-          <label class="check-item"><input type="checkbox" class="efeito" value="prisao_ventre"> Prisão de ventre</label>
-          <label class="check-item"><input type="checkbox" class="efeito" value="nenhum"> Nenhum</label>
-        </div>
-      </div>
-      <div class="field">
-        <label for="efeitos">Outros efeitos (opcional)</label>
-        <textarea id="efeitos" placeholder="Descreva brevemente..."></textarea>
-      </div>
+      <p class="card-title">😊 Bem-estar</p>
+      <div class="chart-box"><canvas id="chartBemEstar"></canvas></div>
+      <p class="legenda">Escala de 1 a 10</p>
     </div>
 
-    <div class="card">
-      <p class="card-title">❤️ Sintomas e bem-estar</p>
-      <div class="field">
-        <label>Bem-estar geral: <span id="bem-val" style="font-weight:600;color:#1a1a18">5</span>/10</label>
-        <div class="scale-row">
-          <input type="range" id="bem_estar" min="1" max="10" value="5" step="1"
-            oninput="document.getElementById('bem-val').textContent=this.value" />
-        </div>
-        <div class="scale-labels"><span>Muito mal</span><span>Excelente</span></div>
-      </div>
+    <div class="card" id="card-med">
+      <p class="card-title">💊 Uso da medicação</p>
+      <div class="med-linha" id="med"></div>
+      <p class="legenda">✅ conforme prescrito · 🟡 quase sempre · ⚪ não consegui</p>
     </div>
 
-    <div class="card">
-      <p class="card-title">💬 Dúvidas</p>
-      <div class="field">
-        <label for="duvidas">Alguma dúvida para a Dra. Ivana?</label>
-        <textarea id="duvidas" placeholder="Escreva aqui suas dúvidas ou observações..."></textarea>
-      </div>
-    </div>
-
-    <button class="btn-submit" id="btn-enviar" onclick="enviar()">
-      <span id="btn-icon">✉️</span>
-      <span id="btn-texto">Enviar resposta</span>
-    </button>
-    <div class="error-msg" id="erro-msg" id="erro-texto"></div>
-
-  </div>
-
-  <div class="success" id="success-msg">
-    <div class="icon">✅</div>
-    <h2>Resposta enviada!</h2>
-    <p>Obrigado pelo seu check-in. A Dra. Ivana irá revisar suas informações antes da próxima consulta.</p>
+    <p class="rodape">
+      Estes são os dados que você informou nos seus check-ins.<br />
+      Dúvidas sobre o tratamento? Fale com o consultório da Dra. Ivana Melo.
+    </p>
   </div>
 
 </div>
 
 <script>
-  // Preenche código e token automaticamente pela URL
-  window.addEventListener('DOMContentLoaded', function() {
-    const params = new URLSearchParams(window.location.search);
-    const codigo = params.get('codigo');
-    const token = params.get('token');
-    if (codigo) {
-      document.getElementById('codigo').value = decodeURIComponent(codigo);
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfW_aKEWfNv_rt1x12-F3kHz2BF8VNpgvR2kfz_vVySBvplu57W-p1AxYeNX-SLh6wPA/exec";
+const VERDE = '#1D9E75', ROXO = '#534AB7', AMBAR = '#BA7517';
+
+const chave = new URLSearchParams(window.location.search).get('chave') || '';
+
+document.getElementById('digitos').addEventListener('keydown', e => { if (e.key === 'Enter') carregar(); });
+document.getElementById('digitos').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, ''); });
+
+if (!chave) {
+  mostrarErro('Link incompleto. Use o link enviado pelo consultório.');
+  document.getElementById('btn-ver').disabled = true;
+}
+
+function mostrarErro(msg) {
+  const el = document.getElementById('erro');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function carregar() {
+  const digitos = document.getElementById('digitos').value.trim();
+  if (digitos.length !== 4) { mostrarErro('Digite os 4 últimos dígitos do seu celular.'); return; }
+  const btn = document.getElementById('btn-ver');
+  btn.disabled = true; btn.textContent = 'Carregando...';
+  document.getElementById('erro').style.display = 'none';
+  try {
+    const url = APPS_SCRIPT_URL + '?acao=minhaEvolucao&chave=' + encodeURIComponent(chave) + '&confirmacao=' + encodeURIComponent(digitos);
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if (!data.ok) throw new Error(data.erro || 'Não foi possível carregar seus dados.');
+    document.getElementById('confirmacao').style.display = 'none';
+    mostrarResultado(data);
+  } catch (err) {
+    mostrarErro(err.message && err.message !== 'Failed to fetch' ? err.message : 'Não foi possível conectar. Verifique sua internet e tente novamente.');
+    btn.disabled = false; btn.textContent = 'Ver minha evolução';
+  }
+}
+
+const fmtData = iso => new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+const fmtKg = n => n.toFixed(1).replace('.', ',') + ' kg';
+const media = arr => arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : null;
+
+function mostrarResultado(data) {
+  const regs = data.registros || [];
+  document.getElementById('resultado').style.display = 'block';
+  document.getElementById('ola').textContent = 'Olá, ' + (data.primeiroNome || '') + '! 💚';
+
+  if (!regs.length) {
+    document.getElementById('ola-sub').textContent = 'Você ainda não tem check-ins registrados. Assim que responder o primeiro, sua evolução aparece aqui.';
+    ['metrics', 'card-destaques'].forEach(id => document.getElementById(id).style.display = 'none');
+    document.querySelectorAll('#resultado .card').forEach(c => c.style.display = 'none');
+    return;
+  }
+
+  document.getElementById('ola-sub').textContent =
+    regs.length === 1
+      ? 'Aqui está o resumo do seu primeiro check-in, de ' + fmtData(regs[0].data) + '.'
+      : 'Aqui está o resumo dos seus ' + regs.length + ' check-ins, desde ' + fmtData(regs[0].data) + '.';
+
+  const labels = regs.map(r => fmtData(r.data));
+  const pesos = regs.map(r => r.peso);
+  const comPeso = regs.filter(r => r.peso !== null);
+  const ultimo = regs[regs.length - 1];
+  const penultimo = regs.length > 1 ? regs[regs.length - 2] : null;
+
+  // ---- Métricas ----
+  const cards = [];
+  cards.push(`<div class="metric"><p class="metric-label">Check-ins realizados</p><p class="metric-val">${regs.length}</p><p class="metric-sub">desde ${fmtData(regs[0].data)}</p></div>`);
+  if (!data.ocultarPeso && comPeso.length) {
+    const atual = comPeso[comPeso.length - 1].peso;
+    cards.push(`<div class="metric"><p class="metric-label">Peso mais recente</p><p class="metric-val">${fmtKg(atual)}</p><p class="metric-sub">em ${fmtData(comPeso[comPeso.length - 1].data)}</p></div>`);
+    if (comPeso.length > 1) {
+      const dif = atual - comPeso[0].peso;
+      const txt = (dif > 0 ? '+' : dif < 0 ? '−' : '') + fmtKg(Math.abs(dif));
+      cards.push(`<div class="metric"><p class="metric-label">Variação de peso</p><p class="metric-val">${txt}</p><p class="metric-sub">desde o primeiro check-in</p></div>`);
     }
-    if (!codigo && !token) {
-      // Acesso direto sem link — mostra campo de código
-      document.getElementById('campo-codigo').style.display = 'block';
-    }
+  }
+  const ex3 = media(regs.slice(-3).map(r => r.exercicio).filter(v => v !== null));
+  if (ex3 !== null) cards.push(`<div class="metric"><p class="metric-label">Atividade física</p><p class="metric-val">${ex3.toFixed(1).replace('.', ',')}</p><p class="metric-sub">dias/semana (média recente)</p></div>`);
+  document.getElementById('metrics').innerHTML = cards.join('');
+
+  // ---- Destaques (só mensagens de incentivo) ----
+  const d = [];
+  if (regs.length >= 2) d.push(['📋', `Você já fez ${regs.length} check-ins. Esse acompanhamento ajuda a ajustar seu tratamento.`]);
+  if (!data.ocultarPeso && comPeso.length > 1) {
+    const dif = comPeso[0].peso - comPeso[comPeso.length - 1].peso;
+    if (dif >= 0.5) d.push(['⚖️', `Você reduziu ${fmtKg(dif)} desde o primeiro check-in.`]);
+  }
+  if (ultimo.exercicio !== null && ultimo.exercicio >= 3) d.push(['🏃', `Você se exercitou ${ultimo.exercicio} dias por semana no último período.`]);
+  else if (penultimo && ultimo.exercicio !== null && penultimo.exercicio !== null && ultimo.exercicio > penultimo.exercicio) d.push(['🏃', 'Você aumentou seus dias de atividade física em relação ao check-in anterior.']);
+  if (ultimo.dieta !== null && ultimo.dieta >= 7) d.push(['🥗', `Você deu nota ${ultimo.dieta}/10 ao seguimento do plano alimentar.`]);
+  else if (penultimo && ultimo.dieta !== null && penultimo.dieta !== null && ultimo.dieta > penultimo.dieta) d.push(['🥗', 'Seu seguimento do plano alimentar melhorou em relação ao check-in anterior.']);
+  const medOk = regs.slice(-3).filter(r => r.medicacao === 'sim').length;
+  if (medOk >= 2) d.push(['💊', 'Você tem usado a medicação conforme prescrito.']);
+  if (!d.length) d.push(['💚', 'Cada check-in ajuda a Dra. Ivana a acompanhar e ajustar seu tratamento. Continue!']);
+  document.getElementById('destaques').innerHTML = d.map(([i, t]) => `<li><span>${i}</span><span>${t}</span></li>`).join('');
+
+  // ---- Gráficos ----
+  const base = (extra) => ({
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: Object.assign({ x: { ticks: { font: { size: 11 } }, grid: { display: false } } }, extra)
   });
+  const linha = (cor, valores) => ({ data: valores, borderColor: cor, backgroundColor: cor + '22', tension: 0.35, pointRadius: 4, pointBackgroundColor: cor, borderWidth: 2, spanGaps: true, fill: false });
 
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfW_aKEWfNv_rt1x12-F3kHz2BF8VNpgvR2kfz_vVySBvplu57W-p1AxYeNX-SLh6wPA/exec";
-
-  function getRadio(name) {
-    const el = document.querySelector('input[name="' + name + '"]:checked');
-    return el ? el.value : "";
+  if (data.ocultarPeso || !comPeso.length) {
+    document.getElementById('card-peso').style.display = 'none';
+  } else {
+    new Chart(document.getElementById('chartPeso'), { type: 'line', data: { labels, datasets: [linha(VERDE, pesos)] },
+      options: base({ y: { ticks: { font: { size: 11 }, callback: v => v + ' kg' }, grid: { color: 'rgba(128,128,128,0.1)' } } }) });
   }
+  new Chart(document.getElementById('chartDieta'), { type: 'line', data: { labels, datasets: [linha(VERDE, regs.map(r => r.dieta))] },
+    options: base({ y: { min: 0, max: 10, ticks: { stepSize: 2, font: { size: 11 } }, grid: { color: 'rgba(128,128,128,0.1)' } } }) });
+  new Chart(document.getElementById('chartExercicio'), { type: 'bar', data: { labels, datasets: [{ data: regs.map(r => r.exercicio), backgroundColor: ROXO, borderRadius: 4, maxBarThickness: 28 }] },
+    options: base({ y: { min: 0, max: 7, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: 'rgba(128,128,128,0.1)' } } }) });
+  new Chart(document.getElementById('chartBemEstar'), { type: 'line', data: { labels, datasets: [linha(AMBAR, regs.map(r => r.bemEstar))] },
+    options: base({ y: { min: 0, max: 10, ticks: { stepSize: 2, font: { size: 11 } }, grid: { color: 'rgba(128,128,128,0.1)' } } }) });
 
-  function getCheckboxes(cls) {
-    return Array.from(document.querySelectorAll('input.' + cls + ':checked')).map(e => e.value);
-  }
-
-  function getDificuldades() {
-    return Array.from(document.querySelectorAll('.check-grid input[type=checkbox]:checked')).map(e => e.value);
-  }
-
-  function mostrarErro(msg) {
-    const el = document.getElementById('erro-msg');
-    el.textContent = msg;
-    el.style.display = 'block';
-  }
-
-  async function enviar() {
-    const nome   = document.getElementById('nome').value.trim();
-    const codigo = document.getElementById('codigo').value.trim();
-    const peso   = document.getElementById('peso').value.trim();
-
-    if (!nome || !codigo || !peso) {
-      mostrarErro("Por favor, preencha nome, código do paciente e peso antes de enviar.");
-      return;
-    }
-
-    const btn = document.getElementById('btn-enviar');
-    btn.disabled = true;
-    document.getElementById('btn-icon').innerHTML = '<div class="spinner"></div>';
-    document.getElementById('btn-texto').textContent = 'Enviando...';
-    document.getElementById('erro-msg').style.display = 'none';
-
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token') || "";
-
-    const payload = {
-      token,
-      nome,
-      codigo,
-      peso: parseFloat(peso),
-      sentimento_peso:    getRadio('sentimento_peso'),
-      dieta:              parseInt(document.getElementById('dieta').value),
-      dificuldades_dieta: getDificuldades(),
-      dias_exercicio:     parseInt(document.getElementById('dias_exercicio').value),
-      intensidade:        parseInt(document.getElementById('intensidade').value),
-      tipo_exercicio:     getRadio('tipo_ex'),
-      medicacao:          getRadio('medicacao'),
-      efeitos_colaterais: getCheckboxes('efeito'),
-      efeitos_outros:      document.getElementById('efeitos').value.trim(),
-      bem_estar:          parseInt(document.getElementById('bem_estar').value),
-      duvidas:            document.getElementById('duvidas').value.trim(),
-    };
-
-    try {
-      const resp = await fetch(APPS_SCRIPT_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain" },
-        body: JSON.stringify(payload),
-      });
-      const data = await resp.json();
-
-      if (data.ok) {
-        document.getElementById('form-body').style.display = 'none';
-        document.getElementById('success-msg').style.display = 'block';
-      } else {
-        mostrarErro(data.erro || "Erro ao enviar. Tente novamente.");
-        btn.disabled = false;
-        document.getElementById('btn-icon').textContent = '✉️';
-        document.getElementById('btn-texto').textContent = 'Enviar resposta';
-      }
-    } catch (err) {
-      mostrarErro("Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.");
-      btn.disabled = false;
-      document.getElementById('btn-icon').textContent = '✉️';
-      document.getElementById('btn-texto').textContent = 'Enviar resposta';
-    }
-  }
+  // ---- Medicação ----
+  const icones = { sim: '✅', quase: '🟡', nao: '⚪' };
+  const meds = regs.filter(r => icones[r.medicacao]);
+  if (!meds.length) document.getElementById('card-med').style.display = 'none';
+  else document.getElementById('med').innerHTML = meds.map(r => `<div class="med-item"><span>${icones[r.medicacao]}</span>${fmtData(r.data)}</div>`).join('');
+}
 </script>
 </body>
 </html>
