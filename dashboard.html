@@ -384,6 +384,26 @@ function abrirDetalhe(codigo) {
   document.getElementById('det-nome').textContent = paciente[1];
   const statusLabel = estaAtivo(paciente) ? 'Ativo' : 'Inativo';
   document.getElementById('det-meta').textContent = `${paciente[2]} · Código: ${paciente[0]} · ${statusLabel} · ${respostas.length} check-in(s) registrado(s)`;
+  // Link pessoal "Minha evolução" (coluna K) — para enviar ao paciente
+  const chaveEvol = paciente[10] ? String(paciente[10]).trim() : '';
+  let boxLink = document.getElementById('det-link-evolucao');
+  if (!boxLink) {
+    boxLink = document.createElement('p');
+    boxLink.id = 'det-link-evolucao';
+    boxLink.style.cssText = 'font-size:13px;color:#6b6b67;margin-top:6px';
+    document.getElementById('det-meta').insertAdjacentElement('afterend', boxLink);
+  }
+  if (chaveEvol) {
+    const urlEvol = 'https://ivanameloendocrino.github.io/acompanhamento-pacientes/evolucao.html?chave=' + encodeURIComponent(chaveEvol);
+    boxLink.innerHTML = '📈 Link "Minha evolução" do paciente: <button type="button" style="font-size:12px;padding:2px 10px;border:1px solid #d3d3cf;border-radius:6px;background:#fff;cursor:pointer">Copiar link</button>';
+    boxLink.querySelector('button').onclick = function () {
+      const b = this;
+      navigator.clipboard.writeText(urlEvol).then(() => { b.textContent = 'Copiado ✓'; setTimeout(() => b.textContent = 'Copiar link', 2000); })
+        .catch(() => window.prompt('Copie o link:', urlEvol));
+    };
+  } else {
+    boxLink.textContent = '📈 Link "Minha evolução": ainda não gerado (rode gerarChavesEvolucao no Apps Script).';
+  }
   // Métricas rápidas
   const ultima = respostas.length ? respostas[respostas.length - 1] : null;
   const primeira = respostas.length ? respostas[0] : null;
